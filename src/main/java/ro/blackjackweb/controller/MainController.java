@@ -28,4 +28,16 @@ public class MainController {
     public List<Card> getDealerCards(@PathVariable Long id) {
         return cardService.getDealerCards(id);
     }
+    @RequestMapping("/hitMe/{id}")
+    public Card hitMe(@PathVariable Long id) {
+        return cardService.hitMe(id);
+    }
+    @RequestMapping("/finish/{id}")
+    public List<Card> finish(@PathVariable Long id) {
+        return cardService.finish(id);
+    }
+    @RequestMapping("/isGameOver/{id}")
+    public boolean isGameOver(@PathVariable Long id) {
+        return cardService.isGameOver(id);
+    }
 }

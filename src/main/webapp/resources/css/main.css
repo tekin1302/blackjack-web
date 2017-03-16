@@ -1,3 +1,18 @@
 .playing-card {
-    width: 150px;
+    display: inline-block;
+    margin: 8px;
+}
+.playing-card img {
+    width: 100px;
+}
+.playing-card.face-down {
+    background: black;
+}
+.playing-card.face-down img {
+    opacity: 0;
+}
+.blackjack-buttons button {
+    margin-right: 10px;
+    padding: 5px;
+    cursor: pointer;
 }

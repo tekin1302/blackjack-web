@@ -44,4 +44,23 @@ public class CardService {
         Game game = getGameById(id);
         return game.getDealerCards();
     }
+
+    public Card hitMe(Long id) {
+        Game game = getGameById(id);
+        game.hitMe();
+        return game.getPlayerCards().get(game.getPlayerCards().size() - 1);
+    }
+
+    public List<Card> finish(Long id) {
+        Game game = getGameById(id);
+        game.finishUserTurn();
+        game.makeDealerMoves(false);
+
+        return game.getDealerCards();
+    }
+
+    public boolean isGameOver(Long id) {
+        Game game = getGameById(id);
+        return game.isGameOver(false);
+    }
 }
