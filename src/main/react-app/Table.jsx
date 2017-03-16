@@ -12,25 +12,36 @@ class Table extends React.Component {
             gameId: Date.now()
         };
 
-        this.getPlayerCards();
-        this.getDealerCards();
+        this.getPlayersCards();
     }
 
-    getPlayerCards(callback) {
-        fetch('./getPlayerCards/' + this.state.gameId)
-            .then((response) => response.json())
-            .then((responseData) => {
-                this.setState({
-                    playerCards: responseData
-                });
+    checkScores(data) {
+        if (data.gameOver) {
+
+            var msg;
+            if (data.winner === 'PLAYER') {
+                msg = 'You win!'
+            } else if (data.winner === 'DEALER') {
+                msg = 'You lost! Game over!';
+            } else {
+                msg = 'It\'s a tie!';
+            }
+            this.setState({
+                finalMsg: msg,
+                playerScore: data.playerScore,
+                dealerScore: data.dealerScore
             });
+        }
     }
-    getDealerCards(callback) {
-        fetch('./getDealerCards/' + this.state.gameId)
+
+    getPlayersCards(callback) {
+        fetch('./getPlayersCards/' + this.state.gameId)
             .then((response) => response.json())
             .then((responseData) => {
+                this.checkScores(responseData);
                 this.setState({
-                    dealerCards: responseData
+                    playerCards: responseData.playerCards,
+                    dealerCards: responseData.dealerCards
                 });
             });
     }
@@ -39,7 +50,8 @@ class Table extends React.Component {
         fetch('./hitMe/' + this.state.gameId)
             .then((response) => response.json())
             .then((responseData) => {
-                this.state.playerCards.push(responseData);
+                this.checkScores(responseData);
+                this.state.playerCards.push(responseData.card);
 
                 this.setState({
                     playerCards: this.state.playerCards
@@ -47,14 +59,15 @@ class Table extends React.Component {
             });
     }
 
-    finish() {
+    finishGame() {
 
         fetch('./finish/' + this.state.gameId)
             .then((response) => response.json())
             .then((responseData) => {
 
+                this.checkScores(responseData);
                 this.setState({
-                    dealerCards: responseData
+                    dealerCards: responseData.dealerCards
                 });
             });
     }
@@ -71,7 +84,7 @@ class Table extends React.Component {
 
         let dealerCardImgs = this.state.dealerCards ? this.state.dealerCards.map((card) => {
             let imgSrc = 'resources/img/cards/' + card.code + '.png';
-            let cardClass = 'playing-card' + (card.faceDown ? ' face-down' : '');
+            let cardClass = 'playing-card' + (!this.state.finalMsg && card.faceDown ? ' face-down' : '');
 
             return (
                 <div className={cardClass} key={card.code}>
@@ -80,7 +93,20 @@ class Table extends React.Component {
             );
         }) : [];
 
+        let gameResults = this.state.finalMsg ? (
+            <div>
+                <h3>{this.state.finalMsg}</h3>
+                <h4>Dealers score: {this.state.dealerScore}</h4>
+                <h4>Your score: {this.state.playerScore}</h4>
+            </div>
+        ) : null;
 
+        let actionButtons = this.state.finalMsg ? null : (
+            <div className="blackjack-buttons">
+                <button onClick={this.hitMe.bind(this)}>Hit me!</button>
+                <button onClick={this.finishGame.bind(this)}>Finish!</button>
+            </div>
+        );
         return (
             <div>
                 <div id="dealerSide">
@@ -91,10 +117,8 @@ class Table extends React.Component {
                     <h2>Your cards:</h2>
                     {playerCardImgs}
                 </div>
-                <div className="blackjack-buttons">
-                    <button onClick={this.hitMe()}>Hit me!</button>
-                    <button onClick={this.finish()}>Finish!</button>
-                </div>
+                {gameResults}
+                {actionButtons}
             </div>
         );
     }
