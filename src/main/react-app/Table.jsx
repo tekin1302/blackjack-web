@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Card from './Card.jsx';
+import Score from './Score.jsx';
+import ActionButtons from './ActionButtons.jsx';
 import 'whatwg-fetch';
 
 class Table extends React.Component {
@@ -34,7 +36,7 @@ class Table extends React.Component {
         }
     }
 
-    getPlayersCards(callback) {
+    getPlayersCards() {
         fetch('./getPlayersCards/' + this.state.gameId)
             .then((response) => response.json())
             .then((responseData) => {
@@ -74,38 +76,20 @@ class Table extends React.Component {
     render () {
 
         let playerCardImgs = this.state.playerCards ? this.state.playerCards.map((card) => {
-            let imgSrc = 'resources/img/cards/' + card.code + '.png';
-            return (
-                <div className="playing-card" key={card.code}>
-                    <img src={imgSrc} />
-                </div>
-            );
+            return <Card data={card} key={card.code} />;
         }) : [];
 
         let dealerCardImgs = this.state.dealerCards ? this.state.dealerCards.map((card) => {
-            let imgSrc = 'resources/img/cards/' + card.code + '.png';
-            let cardClass = 'playing-card' + (!this.state.finalMsg && card.faceDown ? ' face-down' : '');
-
-            return (
-                <div className={cardClass} key={card.code}>
-                    <img src={imgSrc} />
-                </div>
-            );
+            card.faceDown = !this.state.finalMsg && card.faceDown;
+            return <Card data={card} key={card.code} />;
         }) : [];
 
-        let gameResults = this.state.finalMsg ? (
-            <div>
-                <h3>{this.state.finalMsg}</h3>
-                <h4>Dealers score: {this.state.dealerScore}</h4>
-                <h4>Your score: {this.state.playerScore}</h4>
-            </div>
-        ) : null;
+        let gameResults = this.state.finalMsg ?
+            <Score finalMsg={this.state.finalMsg} dealerScore={this.state.dealerScore} playerScore={this.state.playerScore} />
+            : null;
 
         let actionButtons = this.state.finalMsg ? null : (
-            <div className="blackjack-buttons">
-                <button onClick={this.hitMe.bind(this)}>Hit me!</button>
-                <button onClick={this.finishGame.bind(this)}>Finish!</button>
-            </div>
+            <ActionButtons hitMe={this.hitMe.bind(this)} finishGame={this.finishGame.bind(this)} />
         );
         return (
             <div>
