@@ -3,7 +3,7 @@
     margin: 8px;
 }
 .playing-card img {
-    width: 100px;
+    height: 130px;
 }
 .playing-card.face-down {
     background: black;
